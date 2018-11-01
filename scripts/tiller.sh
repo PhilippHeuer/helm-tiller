@@ -132,6 +132,15 @@ stop_tiller() {
   if [[ "${HELM_TILLER_SILENT}" == "false" ]]; then
     echo "Stopping Tiller..."
   fi
+
+  while helm list --tiller-namespace ${TILLER_NAMESPACE} | grep -e -i "(UNKNOWN|DELETING)"
+  do
+    sleep 1
+    if [[ "${HELM_TILLER_SILENT}" == "false" ]]; then
+      echo "Some releases are still progressing, quitting now will leave your releases in an inconsistent state. Waiting ..."
+    fi
+  done
+
   pkill -f ./bin/tiller
 }
 
